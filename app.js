@@ -18,7 +18,7 @@ export const SESSION = new Map();
 
 app.use(cors({
 
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://attendance-frontend-taupe.vercel.app"],
     credentials: true
 }));
 

@@ -37,7 +37,7 @@ export const loginUser = async (req, res) => {
 
         const sessionID = crypto.randomUUID();
         
-        if(user == null){
+        if(await user == null){
 
             res.status(401).json({
 

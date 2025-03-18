@@ -88,9 +88,10 @@ export class System {
             const query = `SELECT * FROM attendance WHERE user_id = $1`;
             const values = [user_id];
 
-            const user = await db.query(query, values);
+            const attendance = await db.query(query, values);
+            
 
-            return user.rows;
+            return attendance.rows;
             
         } catch (error) {
             

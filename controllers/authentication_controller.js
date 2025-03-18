@@ -31,7 +31,7 @@ export const registerUser = async(req, res) => {
 export const loginUser = async (req, res) => {
 
     try {
-
+        
         const user = await System.getUserByUsername(req.body.username);
         const password = req.body["password"];
 
@@ -92,8 +92,6 @@ export const checkDuplicateUsername = async(req, res, next) => {
 export const protectRoute = async (req, res) => {
 
     const user = SESSION.get(req.cookies.sessionID);
-
-    console.log(user);
     
 
     if(user == null){

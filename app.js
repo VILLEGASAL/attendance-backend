@@ -18,7 +18,8 @@ export const SESSION = new Map();
 
 app.use(cors({
 
-    origin: ["http://localhost:5173", "https://attendance-frontend-git-main-villegasals-projects.vercel.app"],
+    origin: ["http://localhost:5173", "https://attendance-frontend-git-main-villegasals-projects.vercel.app", "https://attendance-frontend-taupe.vercel.app
+"],
     credentials: true
 }));
 

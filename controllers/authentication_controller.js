@@ -57,6 +57,12 @@ export const loginUser = async (req, res) => {
                 sameSite: "none" }).json(user);
             
             return;
+        }else{
+
+            res.status(401).json({
+
+                message: "No user found!"
+            });
         }
         
     } catch (error) {

@@ -63,8 +63,8 @@ export class System {
 
         try {
  
-            const query = `INSERT INTO users (first_name, last_name, username, password, total_hours, remaining_hours) VALUES ($1, $2, $3, $4, $5, $6)`;
-            const values = [firstName, lastName, username, password, 0, 0];
+            const query = `INSERT INTO users (first_name, last_name, username, password) VALUES ($1, $2, $3, $4)`;
+            const values = [firstName, lastName, username, password];
 
             await db.query(query, values);
 

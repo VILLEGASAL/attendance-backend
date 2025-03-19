@@ -91,18 +91,21 @@ export const checkDuplicateUsername = async(req, res, next) => {
 
 export const protectRoute = async (req, res) => {
 
-    const user = SESSION.get(req.cookies.sessionID);
-    
+    const getUser = SESSION.get(req.cookies.sessionID);
 
-    if(user == null){
+    if(getUser == null){
 
         res.sendStatus(401);
         return;
+    
+    }else{
+
+        const user = await System.getUserById(getUser.user_id)
+
+        res.status(200).json(user);
+
+        return;
     }
-
-    res.status(200).json(user);
-
-    return;
 }
 
 export const checkIfAuthenticated = async (req, res, next) => {

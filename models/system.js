@@ -119,12 +119,42 @@ export class System {
         }
     }
 
-    
-    static updateUserRemainingTime = async (user_id) => {
+    static getUserRemainingHours = async (user_id) => {
 
         try{
 
-            const computeRemainingTime = 270 - Number(await this.getUserTotalhours(user_id));
+            const query = `SELECT remaining_hours FROM users WHERE user_id = $1`;
+            const value = [user_id];
+
+            const userRemainingHours = await db.query(query, value);
+            
+            return userRemainingHours.rows[0].remaining_hours;
+
+        }catch(error){
+
+            console.log(error.message);
+
+            return false;
+        }
+    } 
+    
+    static updateUserRemainingTime = async (hour, user_id, toAdd) => {
+
+        try{
+
+            if (toAdd) {
+                
+                const computeRemainingTime = Number(await this.getUserRemainingHours(user_id)) - Number(hour);
+
+                const query = `UPDATE users SET remaining_hours = $1 WHERE user_id = $2`;
+                const value = [computeRemainingTime, user_id];
+
+                await db.query(query, value);
+
+                return true;
+            }
+
+            const computeRemainingTime = Number(await this.getUserRemainingHours(user_id)) + Number(hour);
 
             const query = `UPDATE users SET remaining_hours = $1 WHERE user_id = $2`;
             const value = [computeRemainingTime, user_id];
@@ -132,6 +162,7 @@ export class System {
             await db.query(query, value);
 
             return true;
+            
 
         }catch(error){
 
@@ -142,20 +173,38 @@ export class System {
         }
     }
 
-    static updateUserTotalHours = async (addedHours, user_id) => {
+    static updateUserTotalHours = async (hours, user_id, toAdd) => {
 
         try {
+            
+            if (toAdd) {
+                
+                const addHour = Number(hours) + Number(await this.getUserTotalhours(user_id));
 
-            const addHour = Number(addedHours) + Number(await this.getUserTotalhours(user_id));
+                const queryToAdd = `UPDATE users SET total_hours = $1 WHERE user_id = $2`;
+                const value = [addHour, user_id];
 
-            const query = `UPDATE users SET total_hours = $1 WHERE user_id = $2`;
-            const value = [addHour, user_id]
+                await db.query(queryToAdd, value);
 
-            await db.query(query, value);
+                return true;
+            }
+
+            
+            const subtractHour = Number(await this.getUserTotalhours(user_id) - Number(hours));
+
+            const queryToSubtract = `UPDATE users SET total_hours = $1 WHERE user_id = $2`;
+            const value = [subtractHour, user_id];
+
+            await db.query(queryToSubtract, value);
+
+            return true;
+            
 
         } catch (error) {
             
             console.log(error.message);
+
+            return false;
         }
     }
 
@@ -167,8 +216,8 @@ export class System {
             const valuesToAddAttendance = [user_id, date, timeIn, timeOut, totalHours];
             await db.query(queryToAddAttendance, valuesToAddAttendance);
 
-            await this.updateUserTotalHours(totalHours, user_id);
-            await this.updateUserRemainingTime(user_id);
+            await this.updateUserTotalHours(totalHours, user_id, true);
+            await this.updateUserRemainingTime(totalHours, user_id, true);
             
             return true;
 
@@ -178,5 +227,50 @@ export class System {
 
             return false;
         }
+    }
+
+    static getAttendanceTotalHours = async (attendance_id) => {
+
+        try {
+
+            const queryToSelectSpecificAttendance = `SELECT total_hours FROM attendance WHERE attendance_id = $1`;
+            
+            const attendanceID = [attendance_id];
+
+            const attendance = await db.query(queryToSelectSpecificAttendance, attendanceID);
+
+            return attendance.rows[0].total_hours;
+
+        } catch (error) {
+
+            console.log(error.message);
+
+            return false;
+        }
+    }
+
+    static deleteUserAttendance = async (attendance_id, user_id) => {
+
+        try {
+
+            const attendanceTotalHours = await this.getAttendanceTotalHours(attendance_id);
+
+            await this.updateUserTotalHours(attendanceTotalHours, user_id, false);
+            await this.updateUserRemainingTime(attendanceTotalHours, user_id, false);
+            
+            const queryToDeleteAttendance = `DELETE FROM attendance WHERE attendance_id = $1`;
+            const idToDelete = [attendance_id];
+
+            await db.query(queryToDeleteAttendance, idToDelete);
+
+            return true;
+
+        } catch (error) {
+            
+            console.log(error.message);
+
+            return false;
+            
+        }   
     }
 }

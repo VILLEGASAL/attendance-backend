@@ -42,3 +42,27 @@ export const addAttendance = async(req, res) => {
         res.status(500).send();
     }
 }
+
+export const deleteAttendance = async (req, res) => {
+
+    try {
+
+        const user = SESSION.get(req.cookies.sessionID);
+
+        const user_id = user.user_id;
+
+        if (await System.deleteUserAttendance(req.params.id, user_id)) {
+         
+            return res.status(200).send(`Successfullyt Deleted an Attendance Record With an ID of: ${req.params.id}`);
+        }else{
+
+            throw new Error(`Failed to delete attendance record.`);
+        }
+        
+    } catch (error) {
+        
+        console.log(error.message);
+
+        return res.sendStatus(500);
+    }
+}
